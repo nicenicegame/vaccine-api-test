@@ -6,6 +6,8 @@ import org.junit.Test;
 import java.io.IOException;
 
 import static org.junit.Assert.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.CoreMatchers.containsString;
 
 /**
  * Test cases for World Class Government API
@@ -222,6 +224,8 @@ public class ApiTest {
                 .surname("Samakpong")
                 .birthDate("2001/06/05")
                 .occupation("Student")
+                .phoneNumber("0970638897")
+                .isRisk(false)
                 .address("122/167")
                 .build();
         Request request = new Request.Builder()
@@ -230,7 +234,10 @@ public class ApiTest {
                 .build();
 
         try (Response response = client.newCall(request).execute()) {
+            Headers headers = response.headers();
             assertEquals(response.code(), 400);
+            assertEquals(headers.get("Content-Type"), "text/html; charset=utf-8");
+            assertThat(response.body().string(), containsString("Bad Request"));
         }
     }
 
@@ -247,6 +254,8 @@ public class ApiTest {
                 .surname("Samakpong")
                 .birthDate("2001/06/05")
                 .occupation("Student")
+                .phoneNumber("0970638897")
+                .isRisk(false)
                 .address("122/167")
                 .build();
         Request request = new Request.Builder()
@@ -255,7 +264,10 @@ public class ApiTest {
                 .build();
 
         try (Response response = client.newCall(request).execute()) {
+            Headers headers = response.headers();
             assertEquals(response.code(), 400);
+            assertEquals(headers.get("Content-Type"), "text/html; charset=utf-8");
+            assertThat(response.body().string(), containsString("Bad Request"));
         }
     }
 
@@ -272,6 +284,8 @@ public class ApiTest {
                 // missing surname field
                 .birthDate("2001/06/05")
                 .occupation("Student")
+                .phoneNumber("0970638897")
+                .isRisk(false)
                 .address("122/167")
                 .build();
         Request request = new Request.Builder()
@@ -280,7 +294,10 @@ public class ApiTest {
                 .build();
 
         try (Response response = client.newCall(request).execute()) {
+            Headers headers = response.headers();
             assertEquals(response.code(), 400);
+            assertEquals(headers.get("Content-Type"), "text/html; charset=utf-8");
+            assertThat(response.body().string(), containsString("Bad Request"));
         }
     }
 
@@ -297,6 +314,8 @@ public class ApiTest {
                 .surname("Samakpong")
                 // missing birth date field
                 .occupation("Student")
+                .phoneNumber("0970638897")
+                .isRisk(false)
                 .address("122/167")
                 .build();
         Request request = new Request.Builder()
@@ -305,7 +324,10 @@ public class ApiTest {
                 .build();
 
         try (Response response = client.newCall(request).execute()) {
+            Headers headers = response.headers();
             assertEquals(response.code(), 400);
+            assertEquals(headers.get("Content-Type"), "text/html; charset=utf-8");
+            assertThat(response.body().string(), containsString("Bad Request"));
         }
     }
 
@@ -322,6 +344,8 @@ public class ApiTest {
                 .surname("Samakpong")
                 .birthDate("2001/06/05")
                 // missing occupation field
+                .phoneNumber("0970638897")
+                .isRisk(false)
                 .address("122/167")
                 .build();
         Request request = new Request.Builder()
@@ -330,7 +354,10 @@ public class ApiTest {
                 .build();
 
         try (Response response = client.newCall(request).execute()) {
+            Headers headers = response.headers();
             assertEquals(response.code(), 400);
+            assertEquals(headers.get("Content-Type"), "text/html; charset=utf-8");
+            assertThat(response.body().string(), containsString("Bad Request"));
         }
     }
 
@@ -347,6 +374,8 @@ public class ApiTest {
                 .surname("Samakpong")
                 .birthDate("2001/06/05")
                 .occupation("Student")
+                .phoneNumber("0970638897")
+                .isRisk(false)
                 // missing address field
                 .build();
         Request request = new Request.Builder()
@@ -355,7 +384,68 @@ public class ApiTest {
                 .build();
 
         try (Response response = client.newCall(request).execute()) {
+            Headers headers = response.headers();
             assertEquals(response.code(), 400);
+            assertEquals(headers.get("Content-Type"), "text/html; charset=utf-8");
+            assertThat(response.body().string(), containsString("Bad Request"));
+        }
+    }
+
+    /**
+     * Test registration with missing required phone number field
+     *
+     * @throws IOException if an error occurred during request execution
+     */
+    @Test
+    public void testRegistrationWithNoPhoneNumber() throws IOException {
+        HttpUrl url = new UserRegistrationUrl.Builder()
+                .citizenId("1102003283576")
+                .name("Tatpol")
+                .surname("Samakpong")
+                .birthDate("2001/06/05")
+                .occupation("Student")
+                // missing phone number field
+                .isRisk(false)
+                .build();
+        Request request = new Request.Builder()
+                .url(url)
+                .post(emptyRequestBody)
+                .build();
+
+        try (Response response = client.newCall(request).execute()) {
+            Headers headers = response.headers();
+            assertEquals(response.code(), 400);
+            assertEquals(headers.get("Content-Type"), "text/html; charset=utf-8");
+            assertThat(response.body().string(), containsString("Bad Request"));
+        }
+    }
+
+    /**
+     * Test registration with missing required is_risk field
+     *
+     * @throws IOException if an error occurred during request execution
+     */
+    @Test
+    public void testRegistrationWithNoIsRisk() throws IOException {
+        HttpUrl url = new UserRegistrationUrl.Builder()
+                .citizenId("1102003283576")
+                .name("Tatpol")
+                .surname("Samakpong")
+                .birthDate("2001/06/05")
+                .occupation("Student")
+                .phoneNumber("0970638897")
+                // missing isRisk field
+                .build();
+        Request request = new Request.Builder()
+                .url(url)
+                .post(emptyRequestBody)
+                .build();
+
+        try (Response response = client.newCall(request).execute()) {
+            Headers headers = response.headers();
+            assertEquals(response.code(), 400);
+            assertEquals(headers.get("Content-Type"), "text/html; charset=utf-8");
+            assertThat(response.body().string(), containsString("Bad Request"));
         }
     }
 
@@ -372,6 +462,8 @@ public class ApiTest {
                 .surname("Samakpong")
                 .birthDate("2001/06/05")
                 .occupation("Student")
+                .phoneNumber("0970638897")
+                .isRisk(false)
                 .address("Thailand")
                 .build();
         Request request = new Request.Builder()
@@ -382,6 +474,9 @@ public class ApiTest {
         try (Response response = client.newCall(request).execute()) {
             // registration should be failed and status code shouldn't be 200
             assertNotEquals(response.code(), 200);
+            RegistrationResponseBody responseBody = new Gson()
+                    .fromJson(response.body().string(), RegistrationResponseBody.class);
+            assertFalse(responseBody.isRegistrationSuccessful());
         }
     }
 
@@ -398,6 +493,8 @@ public class ApiTest {
                 .surname("Samakpong")
                 .birthDate("2001/06/05")
                 .occupation("Student")
+                .phoneNumber("0970638897")
+                .isRisk(false)
                 .address("Thailand")
                 .build();
         Request request = new Request.Builder()
@@ -408,6 +505,9 @@ public class ApiTest {
         try (Response response = client.newCall(request).execute()) {
             // registration should be failed and status code shouldn't be 200
             assertNotEquals(response.code(), 200);
+            RegistrationResponseBody responseBody = new Gson()
+                    .fromJson(response.body().string(), RegistrationResponseBody.class);
+            assertFalse(responseBody.isRegistrationSuccessful());
         }
     }
 
@@ -424,6 +524,8 @@ public class ApiTest {
                 .surname("Guy")
                 .birthDate("1996/30/03")
                 .occupation("Student")
+                .phoneNumber("0970638897")
+                .isRisk(false)
                 .address("Thailand")
                 .build();
         Request request = new Request.Builder()
@@ -434,6 +536,9 @@ public class ApiTest {
         try (Response response = client.newCall(request).execute()) {
             // registration should be failed and status code shouldn't be 200
             assertNotEquals(response.code(), 200);
+            RegistrationResponseBody responseBody = new Gson()
+                    .fromJson(response.body().string(), RegistrationResponseBody.class);
+            assertFalse(responseBody.isRegistrationSuccessful());
         }
     }
 }
