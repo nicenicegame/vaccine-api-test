@@ -202,7 +202,8 @@ public class ApiTest {
         try (Response response = client.newCall(request).execute()) {
             RegistrationResponseBody responseBody = new Gson()
                     .fromJson(response.body().string(), RegistrationResponseBody.class);
-            assertEquals(response.code(), 200);
+            // registration should be failed and status code shouldn't be 200
+            assertNotEquals(response.code(), 200);
             assertFalse(responseBody.isRegistrationSuccessful());
             assertEquals(
                     responseBody.getFeedback(),
@@ -459,7 +460,7 @@ public class ApiTest {
         HttpUrl url = new UserRegistrationUrl.Builder()
                 .citizenId("1102003283576")
                 .name("213432994")
-                .surname("Samakpong")
+                .surname("232134")
                 .birthDate("2001/06/05")
                 .occupation("Student")
                 .phoneNumber("0970638897")
@@ -508,6 +509,7 @@ public class ApiTest {
             RegistrationResponseBody responseBody = new Gson()
                     .fromJson(response.body().string(), RegistrationResponseBody.class);
             assertFalse(responseBody.isRegistrationSuccessful());
+            assertEquals(responseBody.getFeedback(), "registration failed: invalid citizen ID");
         }
     }
 
@@ -519,7 +521,7 @@ public class ApiTest {
     @Test
     public void testRegistrationMisFormatBirthDate() throws IOException {
         HttpUrl url = new UserRegistrationUrl.Builder()
-                .citizenId("1102003283576")
+                .citizenId("1102003283573")
                 .name("Hello")
                 .surname("Guy")
                 .birthDate("1996/30/03")
@@ -539,6 +541,7 @@ public class ApiTest {
             RegistrationResponseBody responseBody = new Gson()
                     .fromJson(response.body().string(), RegistrationResponseBody.class);
             assertFalse(responseBody.isRegistrationSuccessful());
+            assertEquals(responseBody.getFeedback(), "registration failed: invalid birth date format");
         }
     }
 }
