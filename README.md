@@ -1,3 +1,7 @@
 ## Vaccine Api Test
 
-Api endpoint used for testing: `https://wcg-apis.herokuapp.com`
+Base url used for testing: `https://wcg-apis.herokuapp.com`
+
+Testing endpoints:
+* `/reservations`
+* `/registration`
