@@ -4,4 +4,8 @@ public class RegistrationResponseBody {
     public String getFeedback() {
         return feedback;
     }
+
+    public Boolean isRegistrationSuccessful() {
+        return feedback.contains("registration success");
+    }
 }

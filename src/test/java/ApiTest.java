@@ -5,8 +5,7 @@ import org.junit.Test;
 
 import java.io.IOException;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.*;
 
 /**
  * Test cases for World Class Government API
@@ -42,6 +41,13 @@ public class ApiTest {
         client = new OkHttpClient();
     }
 
+    /**
+     * Helper function to check if the user with given citizen id is existed
+     *
+     * @param citizenId of user for checking
+     * @return true if the user with given citizen id is exited, otherwise false
+     * @throws IOException if an error occurred during request execution
+     */
     public Boolean isUserExisted(String citizenId) throws IOException {
         Request request = new Request.Builder()
                 .url(baseUrl + "/registration/" + citizenId)
@@ -56,9 +62,15 @@ public class ApiTest {
         }
     }
 
+    /**
+     * Helper function to delete specifics user by citizen id
+     *
+     * @param citizenId of user to delete
+     * @throws IOException if an error occurred during request execution
+     */
     public void deleteUserByCitizenId(String citizenId) throws IOException {
         Request request = new Request.Builder()
-                .url(baseUrl + "/registration/" + citizenId )
+                .url(baseUrl + "/registration/" + citizenId)
                 .delete()
                 .build();
 
@@ -119,10 +131,17 @@ public class ApiTest {
             RegistrationResponseBody responseBody = new Gson()
                     .fromJson(response.body().string(), RegistrationResponseBody.class);
             assertEquals(response.code(), 201);
+            assertTrue(responseBody.isRegistrationSuccessful());
             assertEquals(responseBody.getFeedback(), "registration success!");
         }
     }
 
+    /**
+     * Test registration with form body (this will automatically set
+     * request headers Content-Type to x-www-form-urlencoded)
+     *
+     * @throws IOException if an error occurred during request execution
+     */
     @Test
     public void testRegistrationWithFormBody() throws IOException {
         String citizenId = "1102003283576";
@@ -151,6 +170,7 @@ public class ApiTest {
             RegistrationResponseBody responseBody = new Gson()
                     .fromJson(response.body().string(), RegistrationResponseBody.class);
             assertEquals(response.code(), 201);
+            assertTrue(responseBody.isRegistrationSuccessful());
             assertEquals(responseBody.getFeedback(), "registration success!");
         }
     }
@@ -181,6 +201,7 @@ public class ApiTest {
             RegistrationResponseBody responseBody = new Gson()
                     .fromJson(response.body().string(), RegistrationResponseBody.class);
             assertEquals(response.code(), 200);
+            assertFalse(responseBody.isRegistrationSuccessful());
             assertEquals(
                     responseBody.getFeedback(),
                     "registration failed: this person already registered"
