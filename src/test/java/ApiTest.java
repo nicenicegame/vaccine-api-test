@@ -1,12 +1,12 @@
 import com.google.gson.Gson;
 import okhttp3.*;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 /**
  * Test cases for World Class Government API
@@ -22,12 +22,12 @@ public class ApiTest {
     /**
      * JSON Media Type
      */
-    private final MediaType JSON = MediaType.get("application/json; charset=utf-8");
+    private final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 
     /**
      * Empty JSON request body
      */
-    private RequestBody emptyRequestBody;
+    private final RequestBody emptyRequestBody = RequestBody.create("", JSON);
 
     /**
      * Http Client
@@ -40,7 +40,32 @@ public class ApiTest {
     @Before
     public void setUp() {
         client = new OkHttpClient();
-        emptyRequestBody = RequestBody.create("", JSON);
+    }
+
+    public Boolean isUserExisted(String citizenId) throws IOException {
+        Request request = new Request.Builder()
+                .url(baseUrl + "/registration/" + citizenId)
+                .build();
+        try (Response response = client.newCall(request).execute()) {
+            if (response.isSuccessful()) {
+                UserResponseBody responseBody = new Gson()
+                        .fromJson(response.body().string(), UserResponseBody.class);
+                return responseBody.getCitizenId().equals(citizenId);
+            }
+            return false;
+        }
+    }
+
+    public void deleteUserByCitizenId(String citizenId) throws IOException {
+        Request request = new Request.Builder()
+                .url(baseUrl + "/registration/" + citizenId )
+                .delete()
+                .build();
+
+        Response response = client.newCall(request).execute();
+        if (!response.isSuccessful()) {
+            throw new IOException("Delete user request failed");
+        }
     }
 
     /**
@@ -67,15 +92,22 @@ public class ApiTest {
      *
      * @throws IOException if an error occurred during request execution
      */
-    @Ignore
     @Test
-    public void testRegistration() throws IOException {
+    public void testRegistrationWithQueryParams() throws IOException {
+        String citizenId = "1102003283576";
+
+        if (isUserExisted(citizenId)) {
+            deleteUserByCitizenId(citizenId);
+        }
+
         HttpUrl url = new UserRegistrationUrl.Builder()
-                .citizenId("1102003283576")
+                .citizenId(citizenId)
                 .name("Tatpol")
                 .surname("Samakpong")
                 .birthDate("2001/06/05")
                 .occupation("Student")
+                .phoneNumber("0970638897")
+                .isRisk(false)
                 .address("122/167")
                 .build();
         Request request = new Request.Builder()
@@ -86,7 +118,39 @@ public class ApiTest {
         try (Response response = client.newCall(request).execute()) {
             RegistrationResponseBody responseBody = new Gson()
                     .fromJson(response.body().string(), RegistrationResponseBody.class);
-            assertEquals(response.code(), 200);
+            assertEquals(response.code(), 201);
+            assertEquals(responseBody.getFeedback(), "registration success!");
+        }
+    }
+
+    @Test
+    public void testRegistrationWithFormBody() throws IOException {
+        String citizenId = "1102003283576";
+
+        if (isUserExisted(citizenId)) {
+            deleteUserByCitizenId(citizenId);
+        }
+
+        RequestBody body = new FormBody.Builder()
+                .add("name", "Tatpol")
+                .add("surname", "Samakpong")
+                .add("citizen_id", citizenId)
+                .add("birth_date", "2001/06/05")
+                .add("occupation", "Student")
+                .add("phone_number", "0970638897")
+                .add("is_risk", "false")
+                .add("address", "122/167")
+                .build();
+
+        Request request = new Request.Builder()
+                .url(baseUrl + "/registration")
+                .post(body)
+                .build();
+
+        try (Response response = client.newCall(request).execute()) {
+            RegistrationResponseBody responseBody = new Gson()
+                    .fromJson(response.body().string(), RegistrationResponseBody.class);
+            assertEquals(response.code(), 201);
             assertEquals(responseBody.getFeedback(), "registration success!");
         }
     }
@@ -104,6 +168,8 @@ public class ApiTest {
                 .surname("Samakpong")
                 .birthDate("2001/06/05")
                 .occupation("Student")
+                .phoneNumber("0970638897")
+                .isRisk(false)
                 .address("122/167")
                 .build();
         Request request = new Request.Builder()
@@ -114,8 +180,7 @@ public class ApiTest {
         try (Response response = client.newCall(request).execute()) {
             RegistrationResponseBody responseBody = new Gson()
                     .fromJson(response.body().string(), RegistrationResponseBody.class);
-            // registration failed, status code should not be 200
-            assertNotEquals(response.code(), 200);
+            assertEquals(response.code(), 200);
             assertEquals(
                     responseBody.getFeedback(),
                     "registration failed: this person already registered"

@@ -37,6 +37,16 @@ public class UserRegistrationUrl {
             return this;
         }
 
+        public Builder phoneNumber(String phoneNumber) {
+            urlBuilder.addQueryParameter("phone_number", phoneNumber);
+            return this;
+        }
+
+        public Builder isRisk(Boolean isRisk) {
+            urlBuilder.addQueryParameter("is_risk", isRisk.toString());
+            return this;
+        }
+
         public Builder address(String address) {
             urlBuilder.addQueryParameter("address", address);
             return this;
